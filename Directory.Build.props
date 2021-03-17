@@ -1,29 +1,61 @@
 <Project>
-  <Import Project="version.props" />
-
   <PropertyGroup>
+    <PackageTags>lets-encrypt;aspnetcore;https;certificates</PackageTags>
     <Authors>Nate McMaster</Authors>
-    <Product>McMaster.AspNetCore.LetsEncrypt</Product>
-    <Copyright>© Nate McMaster</Copyright>
+    <Copyright>Copyright © Nate McMaster</Copyright>
     <NeutralLanguage>en-US</NeutralLanguage>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/natemcmaster/LetsEncrypt</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/natemcmaster/LetsEncrypt.git</RepositoryUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/natemcmaster/LettuceEncrypt</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/natemcmaster/LettuceEncrypt</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <SourceLinkCreate>true</SourceLinkCreate>
-    <DebugType>embedded</DebugType>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <DebugType>portable</DebugType>
     <IsPackable>false</IsPackable>
-    <LangVersion>Latest</LangVersion>
-    <!-- not all dependencies are signed
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)files\StrongName.snk</AssemblyOriginatorKeyFile>
+    <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
+    <IncludeSymbols>true</IncludeSymbols>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <LangVersion>9.0</LangVersion>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)src\StrongName.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign> -->
+    <NoWarn>$(NoWarn);NU5105</NoWarn>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);CS1591</WarningsNotAsErrors>
+    <IsPackableFalseWarningTask>false</IsPackableFalseWarningTask>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateFullPaths Condition="'$(VSCODE_PID)' != ''">true</GenerateFullPaths>
+    <GenerateFullPaths Condition="'$(TERM_PROGRAM)' == 'vscode'">true</GenerateFullPaths>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     <BaseOutputPath>$(MSBuildThisFileDirectory).build\$(MSBuildProjectName)\bin\</BaseOutputPath>
     <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory).build\$(MSBuildProjectName)\obj\</BaseIntermediateOutputPath>
+    <!-- Hide results files in Solution Explorer -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);TestResults\**</DefaultItemExcludes>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionSuffix>beta</VersionSuffix>
+    <IncludePreReleaseLabelInPackageVersion Condition="'$(IS_STABLE_BUILD)' != 'true'">true</IncludePreReleaseLabelInPackageVersion>
+    <BuildNumber Condition=" '$(BuildNumber)' == '' ">$([MSBuild]::ValueOrDefault($(BUILD_NUMBER), 0))</BuildNumber>
+    <VersionSuffix>$(VersionSuffix).$(BuildNumber)</VersionSuffix>
+    <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">$(BUILD_SOURCEVERSION)</SourceRevisionId>
+    <PackageVersion>$(VersionPrefix)</PackageVersion>
+    <PackageVersion Condition="'$(IncludePreReleaseLabelInPackageVersion)' == 'true'">$(PackageVersion)-$(VersionSuffix)</PackageVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl>https://raw.githubusercontent.com/wiki/natemcmaster/LettuceEncrypt/logo.png</PackageIconUrl>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(IsPackable)' == 'true' ">
+    <None Include="$(MSBuildThisFileDirectory)src\icon.png">
+      <Pack>true</Pack>
+      <PackagePath>/$(PackageIcon)</PackagePath>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
+  <Import Project="$(MSBuildProjectDirectory)/releasenotes.props"
+          Condition="Exists('$(MSBuildProjectDirectory)/releasenotes.props')" />
 </Project>

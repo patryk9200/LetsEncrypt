@@ -1,2 +1,14 @@
-<Project>
+<Project InitialTargets="UpdateCiSettings">
+
+  <Target Name="UpdateCiSettings" Condition="'$(CI)' == 'true' and '$(MSBuildProjectName)' == 'LettuceEncrypt' ">
+    <Message Importance="High" Text="::set-output name=package_version::$(PackageVersion)" />
+  </Target>
+
+  <PropertyGroup>
+    <PackageDescription Condition=" '$(SourceRevisionId)' != '' and '$(RepositoryUrl)' != '' ">$(PackageDescription)
+
+This package was build from source code at $(RepositoryUrl)/tree/$(SourceRevisionId)
+    </PackageDescription>
+  </PropertyGroup>
+
 </Project>

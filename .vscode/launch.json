@@ -6,9 +6,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/.build/Web/bin/Debug/netcoreapp2.1/Web.dll",
+      "program": "${workspaceFolder}/.build/Web/bin/Debug/netcoreapp3.1/Web.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/sample/Web",
+      "cwd": "${workspaceFolder}/samples/Web",
       "stopAtEntry": false,
       "internalConsoleOptions": "openOnSessionStart",
       "launchBrowser": {
@@ -26,7 +26,8 @@
         }
       },
       "env": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Staging",
+        "ASPNETCORE_URLS": "http://localhost:5001;https://+:5002"
       },
       "sourceFileMap": {
         "/Views": "${workspaceFolder}/Views"

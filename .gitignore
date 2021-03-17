@@ -4,3 +4,7 @@ bin/
 .vs/
 .build/
 artifacts/
+*.user
+TestResults/
+.idea/
+*.iml

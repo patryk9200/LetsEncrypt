@@ -1,5 +1,11 @@
-﻿using Microsoft.AspNetCore;
+﻿// Copyright (c) Nate McMaster.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
+using System.Net;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
+using Microsoft.Extensions.Hosting;
 
 namespace Web
 {
@@ -7,26 +13,43 @@ namespace Web
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                   .UseLetsEncrypt(o =>
-                   {
-                       // The domain names for which to generate certificates
-                       o.HostNames = new[] { "example.com" };
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
 
-                       // Set this to automatically accept Let's Encrypt's terms of service
-                       o.AcceptTermsOfService = true;
+                    // This example shows how to configure Kestrel's client certificate requirements along with
+                    // enabling Lettuce Encrypt's certificate automation.
+                    if (Environment.GetEnvironmentVariable("REQUIRE_CLIENT_CERT") == "true")
+                    {
+                        webBuilder.UseKestrel(k =>
+                        {
+                            var appServices = k.ApplicationServices;
+                            k.ConfigureHttpsDefaults(h =>
+                            {
+                                h.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
+                                h.UseLettuceEncrypt(appServices);
+                            });
+                        });
+                    }
 
-                       // The email address to register with your application
-                       o.EmailAddress = "admin@example.com";
-
-                       // Use the staging server when developing your app
-                       // to avoid rate limits until you're app is ready for production
-                       o.UseStagingServer = true;
-                   })
-                   .UseStartup<Startup>();
+                    // This example shows how to configure Kestrel's address/port binding along with
+                    // enabling Lettuce Encrypt's certificate automation.
+                    if (Environment.GetEnvironmentVariable("CONFIG_KESTREL_VIA_CODE") == "true")
+                    {
+                        webBuilder.PreferHostingUrls(false);
+                        webBuilder.UseKestrel(k =>
+                        {
+                            var appServices = k.ApplicationServices;
+                            k.Listen(IPAddress.Any, 443,
+                                o =>
+                                    o.UseHttps(h => h.UseLettuceEncrypt(appServices)));
+                        });
+                    }
+                });
     }
 }
